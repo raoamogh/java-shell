@@ -1,5 +1,7 @@
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.List;
 
 public class Main {
     public static String findCmd(String cmd){
@@ -53,8 +55,25 @@ public class Main {
                     }
                 }
             } else {
-                System.out.println(input + ": command not found");
-            }
+                String exec = findCmd(parts[0]);
+                if(exec != null){
+                    List<String> cmd = new ArrayList<>();
+                    cmd.add(exec);
+                    for(int i = 1; i < parts.length; i++){
+                        cmd.add(parts[i]);
+                    }
+                    try{
+                        ProcessBuilder pb = new ProcessBuilder(cmd);
+                        pb.inheritIO();
+                        Process process = pb.start();
+                        process.waitFor();
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.out.println(input + ": command not found");
+                }
+            } 
         }
     }
 }
