@@ -21,6 +21,7 @@ public class Main {
     }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
+        String currDir = System.getProperty("user.dir");
         while(true){
             System.out.print("$ ");
             String input = sc.nextLine();
@@ -43,7 +44,7 @@ public class Main {
             } else if(parts[0].equals("type")){
                 String cmd = parts[1];
 
-                if(cmd.equals("echo") || cmd.equals("exit") || cmd.equals("type")){
+                if(cmd.equals("echo") || cmd.equals("exit") || cmd.equals("type") || cmd.equals("pwd")){
                     System.out.println(cmd + " is a shell builtin");
                 } else {
                     String loc = findCmd(cmd);
@@ -54,6 +55,8 @@ public class Main {
                         System.out.println(cmd + ": not found");
                     }
                 }
+            } else if(parts[0].equals("pwd")){
+                System.out.println(currDir);
             } else {
                 String exec = findCmd(parts[0]);
                 if(exec != null){
