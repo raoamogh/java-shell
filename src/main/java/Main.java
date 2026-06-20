@@ -89,12 +89,12 @@ public class Main {
                     break;
                 } else if(parts.get(i).equals("2>>")){
                     errorFile = parts.get(i+1);
-                    appendOutput = true;
+                    appendError = true;
                     parts = new ArrayList<>(parts.subList(0, i));
                     break;
                 } else if(parts.get(i).equals("2>")) {
                     errorFile = parts.get(i+1);
-                    appendOutput = false;
+                    appendError = false;
                     parts = new ArrayList<>(parts.subList(0, i));
                     break;
                 }
