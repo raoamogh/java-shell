@@ -57,6 +57,14 @@ public class Main {
                 }
             } else if(parts[0].equals("pwd")){
                 System.out.println(currDir);
+            } else if(parts[0].equals("cd")){
+                File dir = new File(parts[1]);
+
+                if(dir.exists() && dir.isDirectory()){
+                    currDir = dir.getAbsolutePath();
+                } else {
+                    System.out.println("cd: " + parts[1] + ": No such file or directory");
+                }
             } else {
                 String exec = findCmd(parts[0]);
                 if(exec != null){
