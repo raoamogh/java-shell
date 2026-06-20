@@ -10,7 +10,7 @@ public class Main {
         for(String dir : dirs){
             File file = new File(dir, cmd);
 
-            if(file.exists()){
+            if(file.isFile() && file.canExecute()){
                 return file.getAbsolutePath();
             }
         }
