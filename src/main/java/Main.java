@@ -63,7 +63,7 @@ public class Main {
                         cmd.add(parts[i]);
                     }
                     try{
-                        ProcessBuilder pb = new ProcessBuilder(cmd);
+                        ProcessBuilder pb = new ProcessBuilder(parts);
                         pb.inheritIO();
                         Process process = pb.start();
                         process.waitFor();
