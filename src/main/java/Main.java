@@ -10,11 +10,13 @@ class Job{
     int id;
     Process process;
     String cmd;
+    String status;
 
     Job(int id, Process process, String cmd){
         this.id = id;
         this.process = process;
         this.cmd = cmd;
+        this.status = "Running";
     }
 }
 
@@ -182,8 +184,12 @@ public class Main {
                     err.println("cd: " + parts.get(1) + ": No such file or directory");
                 }
             } else if(parts.get(0).equals("jobs")){
-                jobs.removeIf(job -> !job.process.isAlive());
-                
+                for(Job job :  jobs){
+                    if(!job.process.isAlive()){
+                        job.status = "Done";
+                    }
+                }
+
                 for (int i = 0; i < jobs.size(); i++) {
                     Job job = jobs.get(i);
                     char marker = ' ';
@@ -198,7 +204,7 @@ public class Main {
                         "[%d]%c  %-23s %s%n",
                         job.id,
                         marker,
-                        "Running",
+                        job.status,
                         job.cmd
                     );
                 }
@@ -228,6 +234,7 @@ public class Main {
                             }
                         }
                         Process process = pb.start();
+                        String command = String.join(" ", parts);
                         if(!bg){
                             process.waitFor();
                         } else {
@@ -235,7 +242,7 @@ public class Main {
                             jobs.add(new Job(
                                 jobId,
                                 process,
-                                input
+                                command
                             ));
                             out.println("[" + jobId + "] " + process.pid());
                         }
