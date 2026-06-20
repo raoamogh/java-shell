@@ -137,6 +137,8 @@ public class Main {
                 }
 
                 out.println();
+            } else if(parts.get(0).equals("exit")){
+                break;
             } else if(parts.get(0).equals("type")){
                 String cmd = parts.get(1);
 
