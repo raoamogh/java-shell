@@ -184,7 +184,7 @@ public class Main {
             } else if(parts.get(0).equals("jobs")){
                 for(Job job : jobs){
                     out.println(
-                        "[" + job.id + "] " + job.cmd
+                        "[" + job.id + "] Running " + job.cmd
                     );
                 }
             } else {
