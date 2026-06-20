@@ -19,6 +19,32 @@ public class Main {
 
         return null;
     }
+
+    public static List<String> parseCmd(String input){
+        List<String> parts = new ArrayList<>();
+        StringBuilder curr = new StringBuilder();
+
+        boolean isSingleQuotes = false;
+
+        for(char c : input.toCharArray()){
+            if(c == '\''){
+                isSingleQuotes = !isSingleQuotes;
+            } else if(c == ' ' && !isSingleQuotes){
+                if(curr.length() > 0){
+                    parts.add(curr.toString());
+                    curr.setLength(0);
+                }
+            } else {
+                curr.append(c);
+            }
+        }
+
+        if(curr.length() > 0){
+            parts.add(curr.toString());
+        }
+
+        return parts;
+    }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         String currDir = System.getProperty("user.dir");
@@ -29,20 +55,20 @@ public class Main {
                 break;
             }
 
-            String[] parts = input.split(" ");
+            List<String> parts = parseCmd(input);
 
-            if(parts[0].equals("echo")){
-                for(int i = 1; i < parts.length; i++){
-                    System.out.print(parts[i]);
+            if(parts.get(0).equals("echo")){
+                for(int i = 1; i < parts.size(); i++){
+                    System.out.print(parts.get(i));
 
-                    if(i != parts.length - 1){
+                    if(i != parts.size() - 1){
                         System.out.print(" ");
                     }
                 }
 
                 System.out.println();
-            } else if(parts[0].equals("type")){
-                String cmd = parts[1];
+            } else if(parts.get(0).equals("type")){
+                String cmd = parts.get(1);
 
                 if(cmd.equals("echo") || cmd.equals("exit") || cmd.equals("type") || cmd.equals("pwd")){
                     System.out.println(cmd + " is a shell builtin");
@@ -55,16 +81,16 @@ public class Main {
                         System.out.println(cmd + ": not found");
                     }
                 }
-            } else if(parts[0].equals("pwd")){
+            } else if(parts.get(0).equals("pwd")){
                 System.out.println(currDir);
-            } else if(parts[0].equals("cd")){
+            } else if(parts.get(0).equals("cd")){
                 File dir;
-                if(parts[1].equals("~")){
+                if(parts.get(1).equals("~")){
                     dir = new File(System.getenv("HOME"));
-                } else if(new File(parts[1]).isAbsolute()){
-                    dir = new File(parts[1]);
+                } else if(new File(parts.get(1)).isAbsolute()){
+                    dir = new File(parts.get(1));
                 } else {
-                    dir = new File(currDir, parts[1]);
+                    dir = new File(currDir, parts.get(1));
                 }
 
                 if(dir.exists() && dir.isDirectory()){
@@ -74,16 +100,11 @@ public class Main {
                         e.printStackTrace();
                     }
                 } else {
-                    System.out.println("cd: " + parts[1] + ": No such file or directory");
+                    System.out.println("cd: " + parts.get(1) + ": No such file or directory");
                 }
             } else {
-                String exec = findCmd(parts[0]);
+                String exec = findCmd(parts.get(0));
                 if(exec != null){
-                    List<String> cmd = new ArrayList<>();
-                    cmd.add(exec);
-                    for(int i = 1; i < parts.length; i++){
-                        cmd.add(parts[i]);
-                    }
                     try{
                         ProcessBuilder pb = new ProcessBuilder(parts);
                         pb.inheritIO();
