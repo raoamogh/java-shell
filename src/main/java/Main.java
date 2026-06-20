@@ -208,6 +208,7 @@ public class Main {
                         job.cmd
                     );
                 }
+                jobs.removeIf(job -> job.status.equals("Done"));
             } else {
                 String exec = findCmd(parts.get(0));
                 if(exec != null){
