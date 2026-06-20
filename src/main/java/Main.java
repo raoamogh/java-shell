@@ -35,8 +35,7 @@ public class Main {
                 escaped = false;
             } else if(c == '\\' && !isSingleQuotes && !isDoubleQuotes){
                 escaped = true;
-            }
-            if(c == '\'' && !isDoubleQuotes){
+            }else if(c == '\'' && !isDoubleQuotes){
                 isSingleQuotes = !isSingleQuotes;
             } else if(c == '"' && !isSingleQuotes ){
                 isDoubleQuotes = !isDoubleQuotes;
