@@ -281,17 +281,16 @@ public class Main {
                                 rightProcess.getOutputStream()
                             );
                         } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     });
 
                     pipeThread.start();
 
                     rightProcess.waitFor();
-                    pipeThread.join();
                     if (leftProcess.isAlive()) {
                         leftProcess.destroy();
                     }
+                    pipeThread.join();
 
                 } catch(Exception e){
                     e.printStackTrace();
