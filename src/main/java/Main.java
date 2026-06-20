@@ -183,8 +183,11 @@ public class Main {
                 }
             } else if(parts.get(0).equals("jobs")){
                 for(Job job : jobs){
-                    out.println(
-                        "[" + job.id + "] Running " + job.cmd
+                    out.printf(
+                        "[%d]+  %-23s %s%n",
+                        job.id,
+                        "Running",
+                        job.cmd
                     );
                 }
             } else {
@@ -222,7 +225,7 @@ public class Main {
                                 process,
                                 input
                             ));
-                            out.println("[" + jobId + "] " + process.pid());
+                            out.println("[" + jobId + "]+ " + process.pid());
                         }
                         
                     } catch (Exception e){
