@@ -72,11 +72,20 @@ public class Main {
 
         return parts;
     }
+
+    public static void updateJobs(List<Job> jobs){
+        for (Job job : jobs){
+            if(!job.process.isAlive()){
+                job.status = "Done";
+            }
+        }
+    }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         String currDir = System.getProperty("user.dir");
         List<Job> jobs = new ArrayList<>();
         while(true){
+            updateJobs(jobs);
             System.out.print("$ ");
             String input = sc.nextLine();
             PrintStream out = System.out;
