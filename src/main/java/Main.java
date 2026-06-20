@@ -74,6 +74,7 @@ public class Main {
             String outputFile = null;
             String errorFile = null;
             boolean appendOutput = false;
+            boolean appendError = false;
 
             for(int i = 0; i < parts.size(); i++){
                 if(parts.get(i).equals(">") || parts.get(i).equals("1>")){
@@ -86,8 +87,14 @@ public class Main {
                     appendOutput = true;
                     parts = new ArrayList<>(parts.subList(0, i));
                     break;
+                } else if(parts.get(i).equals("2>>")){
+                    errorFile = parts.get(i+1);
+                    appendOutput = true;
+                    parts = new ArrayList<>(parts.subList(0, i));
+                    break;
                 } else if(parts.get(i).equals("2>")) {
                     errorFile = parts.get(i+1);
+                    appendOutput = false;
                     parts = new ArrayList<>(parts.subList(0, i));
                     break;
                 }
@@ -104,7 +111,7 @@ public class Main {
 
             if(errorFile != null){
                 try{
-                    err = new PrintStream(new FileOutputStream(errorFile));
+                    err = new PrintStream(new FileOutputStream(errorFile, appendError));
                 } catch(Exception e){
                     e.printStackTrace();
                 }
@@ -172,7 +179,13 @@ public class Main {
                             
                         }
                         if(errorFile != null){
-                            pb.redirectError(new File(errorFile));
+                            if(appendError){
+                                pb.redirectError(
+                                    ProcessBuilder.Redirect.appendTo(new File(errorFile))
+                                );
+                            } else {
+                                pb.redirectError(new File(errorFile));
+                            }
                         }
                         Process process = pb.start();
                         process.waitFor();
