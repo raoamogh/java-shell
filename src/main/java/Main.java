@@ -216,11 +216,13 @@ public class Main {
                         if(!bg){
                             process.waitFor();
                         } else {
+                            int jobId = jobs.size()+1;
                             jobs.add(new Job(
-                                jobs.size()+1,
+                                jobId,
                                 process,
                                 input
                             ));
+                            out.println("[" + jobId + "] " + process.pid());
                         }
                         
                     } catch (Exception e){
