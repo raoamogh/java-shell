@@ -6,16 +6,22 @@ import java.io.PrintStream;
 import java.io.FileOutputStream;
 
 
-class Job{
+class Job {
     int id;
     Process process;
-    String cmd;
+
+    String runningCmd;
+    String doneCmd;
+
     String status;
 
-    Job(int id, Process process, String cmd){
+    Job(int id, Process process, String command) {
         this.id = id;
         this.process = process;
-        this.cmd = cmd;
+
+        this.runningCmd = command;
+        this.doneCmd = command.replaceAll("\\s*&\\s*$", "");
+
         this.status = "Running";
     }
 }
@@ -78,11 +84,19 @@ public class Main {
             if (!job.process.isAlive() && job.status.equals("Running")) {
                 job.status = "Done";
 
+                String command;
+
+                if(job.status.equals("Running")) {
+                    command = job.runningCmd;
+                } else {
+                    command = job.doneCmd;
+                }
+
                 System.out.printf(
                     "[%d]+  %-23s %s%n",
                     job.id,
                     "Done",
-                    job.cmd
+                    command
                 );
             }
         }
@@ -216,12 +230,20 @@ public class Main {
                         marker = '-';
                     }
 
+                    String command;
+
+                    if(job.status.equals("Running")) {
+                        command = job.runningCmd;
+                    } else {
+                        command = job.doneCmd;
+                    }
+
                     out.printf(
                         "[%d]%c  %-23s %s%n",
                         job.id,
                         marker,
                         job.status,
-                        job.cmd
+                        command
                     );
                 }
                 jobs.removeIf(job -> job.status.equals("Done"));
@@ -259,7 +281,7 @@ public class Main {
                             jobs.add(new Job(
                                 jobId,
                                 process,
-                                command
+                                input
                             ));
                             out.println("[" + jobId + "] " + process.pid());
                         }
