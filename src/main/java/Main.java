@@ -73,10 +73,17 @@ public class Main {
         return parts;
     }
 
-    public static void updateJobs(List<Job> jobs){
-        for (Job job : jobs){
-            if(!job.process.isAlive()){
+    public static void checkFinishedJobs(List<Job> jobs) {
+        for (Job job : jobs) {
+            if (!job.process.isAlive() && job.status.equals("Running")) {
                 job.status = "Done";
+
+                System.out.printf(
+                    "[%d]+  %-23s %s%n",
+                    job.id,
+                    "Done",
+                    job.cmd
+                );
             }
         }
     }
@@ -85,7 +92,7 @@ public class Main {
         String currDir = System.getProperty("user.dir");
         List<Job> jobs = new ArrayList<>();
         while(true){
-            updateJobs(jobs);
+            checkFinishedJobs(jobs);
             System.out.print("$ ");
             String input = sc.nextLine();
             PrintStream out = System.out;
