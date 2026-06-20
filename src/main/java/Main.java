@@ -110,6 +110,13 @@ public class Main {
                 }
             }
 
+            boolean bg = false;
+
+            if(!parts.isEmpty() && parts.get(parts.size()-1).equals("&")){
+                bg = true;
+                parts.remove(parts.size() - 1);
+            }
+
             if(outputFile != null){
                 try{
                     out = new PrintStream(new FileOutputStream(outputFile, appendOutput));
@@ -177,7 +184,7 @@ public class Main {
             } else if(parts.get(0).equals("jobs")){
                 for(Job job : jobs){
                     out.println(
-                        "["+job.id+"]"+job.cmd
+                        "[" + job.id + "] " + job.cmd
                     );
                 }
             } else {
@@ -206,7 +213,16 @@ public class Main {
                             }
                         }
                         Process process = pb.start();
-                        process.waitFor();
+                        if(!bg){
+                            process.waitFor();
+                        } else {
+                            jobs.add(new Job(
+                                jobs.size()+1,
+                                process,
+                                input
+                            ));
+                        }
+                        
                     } catch (Exception e){
                         e.printStackTrace();
                     }
