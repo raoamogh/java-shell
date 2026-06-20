@@ -159,6 +159,14 @@ public class Main {
             id++;
         }
     }
+
+    public static boolean isBuiltin(String cmd) {
+        return cmd.equals("echo") ||
+            cmd.equals("exit") ||
+            cmd.equals("type") ||
+            cmd.equals("jobs") ||
+            cmd.equals("pwd");
+    }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         String currDir = System.getProperty("user.dir");
@@ -252,6 +260,26 @@ public class Main {
 
                     String leftPath = findCmd(left.get(0));
                     String rightPath = findCmd(right.get(0));
+
+                    if (isBuiltin(right.get(0))) {
+                        if (right.get(0).equals("type")) {
+                            String cmd = right.get(1);
+
+                            if (isBuiltin(cmd)) {
+                                System.out.println(cmd + " is a shell builtin");
+                            } else {
+                                String loc = findCmd(cmd);
+
+                                if (loc != null) {
+                                    System.out.println(cmd + " is " + loc);
+                                } else {
+                                    System.out.println(cmd + ": not found");
+                                }
+                            }
+                        }
+
+                        continue;
+                    }
 
                     if(leftPath == null || rightPath == null){
                         err.println("command not found");
