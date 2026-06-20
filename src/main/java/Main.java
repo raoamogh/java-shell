@@ -5,6 +5,19 @@ import java.util.List;
 import java.io.PrintStream;
 import java.io.FileOutputStream;
 
+
+class Job{
+    int id;
+    Process process;
+    String cmd;
+
+    Job(int id, Process process, String cmd){
+        this.id = id;
+        this.process = process;
+        this.cmd = cmd;
+    }
+}
+
 public class Main {
     public static String findCmd(String cmd){
         String path = System.getenv("PATH");
@@ -60,15 +73,12 @@ public class Main {
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         String currDir = System.getProperty("user.dir");
+        List<Job> jobs = new ArrayList<>();
         while(true){
             System.out.print("$ ");
             String input = sc.nextLine();
             PrintStream out = System.out;
             PrintStream err = System.err;
-
-            if(input.equals("exit")){
-                break;
-            }
 
             List<String> parts = parseCmd(input);
             String outputFile = null;
@@ -161,6 +171,12 @@ public class Main {
                     }
                 } else {
                     err.println("cd: " + parts.get(1) + ": No such file or directory");
+                }
+            } else if(parts.get(0).equals("jobs")){
+                for(Job job : jobs){
+                    out.println(
+                        "["+job.id+"]"+job.cmd
+                    );
                 }
             } else {
                 String exec = findCmd(parts.get(0));
