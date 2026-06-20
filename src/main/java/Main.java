@@ -33,7 +33,7 @@ public class Main {
             if(escaped){
                 curr.append(c);
                 escaped = false;
-            } else if(c == '\\' && !isSingleQuotes && !isDoubleQuotes){
+            } else if(c == '\\' && !isSingleQuotes){
                 escaped = true;
             }else if(c == '\'' && !isDoubleQuotes){
                 isSingleQuotes = !isSingleQuotes;
