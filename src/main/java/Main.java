@@ -125,11 +125,11 @@ public class Main {
         List<Job> jobs = new ArrayList<>();
         int nextJobId = 1;
         while(true){
-            reapJobs(jobs);
             updateJobs(jobs);
             notifyDoneJobs(jobs);
             System.out.print("$ ");
             String input = sc.nextLine();
+            reapJobs(jobs);
             PrintStream out = System.out;
             PrintStream err = System.err;
 
