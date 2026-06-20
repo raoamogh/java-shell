@@ -162,7 +162,14 @@ public class Main {
                         ProcessBuilder pb = new ProcessBuilder(parts);
                         pb.inheritIO();
                         if(outputFile != null){
-                            pb.redirectOutput(new File(outputFile));
+                            if(appendOutput){
+                                pb.redirectOutput(
+                                    ProcessBuilder.Redirect.appendTo(new File(outputFile))
+                                );
+                            } else {
+                                pb.redirectOutput(new File(outputFile));
+                            }
+                            
                         }
                         if(errorFile != null){
                             pb.redirectError(new File(errorFile));
