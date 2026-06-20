@@ -4,6 +4,8 @@ import java.util.Scanner;
 import java.util.List;
 import java.io.PrintStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 class Job {
@@ -43,6 +45,23 @@ public class Main {
         }
 
         return null;
+    }
+
+    public static void transfer(
+        java.io.InputStream in,
+        java.io.OutputStream out
+    ) throws Exception {
+
+        byte[] buffer = new byte[8192];
+
+        int len;
+
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
+        }
+
+        out.close();
+        in.close();
     }
 
     public static List<String> parseCmd(String input){
@@ -184,12 +203,23 @@ public class Main {
                 }
             }
 
+
             boolean bg = false;
 
             if(!parts.isEmpty() && parts.get(parts.size()-1).equals("&")){
                 bg = true;
                 parts.remove(parts.size() - 1);
             }
+
+            int pipeIndex = -1;
+
+            for(int i = 0; i < parts.size(); i++){
+                if(parts.get(i).equals("|")) {
+                    pipeIndex = i;
+                    break;
+                }
+            }
+
 
             if(outputFile != null){
                 try{
@@ -208,7 +238,56 @@ public class Main {
                 }
             }
 
-            if(parts.get(0).equals("echo")){
+            if(pipeIndex != -1){
+                List<String> left = new ArrayList<>(parts.subList(0, pipeIndex));
+                List<String> right = new ArrayList<>(parts.subList(pipeIndex+1, parts.size()));
+            }
+            if(pipeIndex != -1){
+                try {
+                    List<String> left =
+                        new ArrayList<>(parts.subList(0, pipeIndex));
+
+                    List<String> right =
+                        new ArrayList<>(parts.subList(pipeIndex + 1, parts.size()));
+
+                    String leftPath = findCmd(left.get(0));
+                    String rightPath = findCmd(right.get(0));
+
+                    if(leftPath == null || rightPath == null){
+                        err.println("command not found");
+                        continue;
+                    }
+
+                    left.set(0, leftPath);
+                    right.set(0, rightPath);
+
+                    ProcessBuilder leftPB =
+                        new ProcessBuilder(left);
+
+                    ProcessBuilder rightPB =
+                        new ProcessBuilder(right);
+
+                    rightPB.inheritIO();
+
+                    Process leftProcess = leftPB.start();
+
+                    Process rightProcess = rightPB.start();
+
+                    transfer(
+                        leftProcess.getInputStream(),
+                        rightProcess.getOutputStream()
+                    );
+
+                    leftProcess.waitFor();
+                    rightProcess.waitFor();
+
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+
+                continue;
+            }
+            else if(parts.get(0).equals("echo")){
                 for(int i = 1; i < parts.size(); i++){
                     out.print(parts.get(i));
 
