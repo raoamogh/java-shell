@@ -261,42 +261,27 @@ public class Main {
                     left.set(0, leftPath);
                     right.set(0, rightPath);
 
-                    ProcessBuilder leftPB =
-                        new ProcessBuilder(left);
+                    ProcessBuilder leftPB = new ProcessBuilder(left);
+                    ProcessBuilder rightPB = new ProcessBuilder(right);
 
-                    ProcessBuilder rightPB =
-                        new ProcessBuilder(right);
-                    
                     rightPB.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                     rightPB.redirectError(ProcessBuilder.Redirect.INHERIT);
 
-                    Process leftProcess = leftPB.start();
+                    List<ProcessBuilder> pipeline = new ArrayList<>();
+                    pipeline.add(leftPB);
+                    pipeline.add(rightPB);
 
-                    Process rightProcess = rightPB.start();
+                    List<Process> processes = ProcessBuilder.startPipeline(pipeline);
 
-                    Thread pipeThread = new Thread(() -> {
-                        try {
-                            transfer(
-                                leftProcess.getInputStream(),
-                                rightProcess.getOutputStream()
-                            );
-                        } catch (Exception e) {
-                        }
-                    });
+                    Process last = processes.get(processes.size() - 1);
 
-                    pipeThread.start();
-
-                    rightProcess.waitFor();
-                    if (leftProcess.isAlive()) {
-                        leftProcess.destroy();
-                    }
-                    pipeThread.join();
+                    last.waitFor();
 
                 } catch(Exception e){
                     e.printStackTrace();
                 }
 
-                continue;
+                continue;            
             } else if(parts.get(0).equals("echo")){
                 for(int i = 1; i < parts.size(); i++){
                     out.print(parts.get(i));
