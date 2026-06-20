@@ -58,10 +58,19 @@ public class Main {
             } else if(parts[0].equals("pwd")){
                 System.out.println(currDir);
             } else if(parts[0].equals("cd")){
-                File dir = new File(parts[1]);
+                File dir;
+                if(new File(parts[1]).isAbsolute()){
+                    dir = new File(parts[1]);
+                } else {
+                    dir = new File(currDir, parts[1]);
+                }
 
                 if(dir.exists() && dir.isDirectory()){
-                    currDir = dir.getAbsolutePath();
+                    try {
+                        currDir = dir.getCanonicalPath();
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
                 } else {
                     System.out.println("cd: " + parts[1] + ": No such file or directory");
                 }
