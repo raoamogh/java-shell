@@ -182,6 +182,8 @@ public class Main {
                     err.println("cd: " + parts.get(1) + ": No such file or directory");
                 }
             } else if(parts.get(0).equals("jobs")){
+                jobs.removeIf(job -> !job.process.isAlive());
+                
                 for (int i = 0; i < jobs.size(); i++) {
                     Job job = jobs.get(i);
                     char marker = ' ';
