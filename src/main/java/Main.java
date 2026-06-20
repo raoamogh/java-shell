@@ -59,7 +59,9 @@ public class Main {
                 System.out.println(currDir);
             } else if(parts[0].equals("cd")){
                 File dir;
-                if(new File(parts[1]).isAbsolute()){
+                if(parts[1].equals("~")){
+                    dir = new File(System.getenv("HOME"));
+                } else if(new File(parts[1]).isAbsolute()){
                     dir = new File(parts[1]);
                 } else {
                     dir = new File(currDir, parts[1]);
