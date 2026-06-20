@@ -182,10 +182,20 @@ public class Main {
                     err.println("cd: " + parts.get(1) + ": No such file or directory");
                 }
             } else if(parts.get(0).equals("jobs")){
-                for(Job job : jobs){
+                for (int i = 0; i < jobs.size(); i++) {
+                    Job job = jobs.get(i);
+                    char marker = ' ';
+
+                    if (i == jobs.size() - 1) {
+                        marker = '+';
+                    } else if (i == jobs.size() - 2) {
+                        marker = '-';
+                    }
+
                     out.printf(
-                        "[%d]+  %-23s %s%n",
+                        "[%d]%c  %-23s %s%n",
                         job.id,
+                        marker,
                         "Running",
                         job.cmd
                     );
@@ -225,24 +235,7 @@ public class Main {
                                 process,
                                 input
                             ));
-                            for (int i = 0; i < jobs.size(); i++) {
-                                Job job = jobs.get(i);
-                                char marker = ' ';
-
-                                if (i == jobs.size() - 1) {
-                                    marker = '+';
-                                } else if (i == jobs.size() - 2) {
-                                    marker = '-';
-                                }
-
-                                out.printf(
-                                    "[%d]%c  %-23s %s%n",
-                                    job.id,
-                                    marker,
-                                    "Running",
-                                    job.cmd
-                                );
-                            }
+                            out.println("[" + jobId + "] " + process.pid());
                         }
                         
                     } catch (Exception e){
