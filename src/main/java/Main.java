@@ -225,7 +225,7 @@ public class Main {
                                 process,
                                 input
                             ));
-                            out.println("[" + jobId + "]+ " + process.pid());
+                            out.println("[" + jobId + "] " + process.pid());
                         }
                         
                     } catch (Exception e){
