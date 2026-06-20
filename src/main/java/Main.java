@@ -230,20 +230,12 @@ public class Main {
                         marker = '-';
                     }
 
-                    String command;
-
-                    if(job.status.equals("Running")) {
-                        command = job.runningCmd;
-                    } else {
-                        command = job.doneCmd;
-                    }
-
                     out.printf(
                         "[%d]%c  %-23s %s%n",
                         job.id,
                         marker,
                         job.status,
-                        command
+                        job.doneCmd
                     );
                 }
                 jobs.removeIf(job -> job.status.equals("Done"));
