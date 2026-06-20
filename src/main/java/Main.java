@@ -73,10 +73,17 @@ public class Main {
             List<String> parts = parseCmd(input);
             String outputFile = null;
             String errorFile = null;
+            boolean appendOutput = false;
 
             for(int i = 0; i < parts.size(); i++){
                 if(parts.get(i).equals(">") || parts.get(i).equals("1>")){
                     outputFile = parts.get(i+1);
+                    appendOutput = false;
+                    parts = new ArrayList<>(parts.subList(0, i));
+                    break;
+                } else if(parts.get(i).equals(">>") || parts.get(i).equals("1>>")){
+                    outputFile = parts.get(i+1);
+                    appendOutput = true;
                     parts = new ArrayList<>(parts.subList(0, i));
                     break;
                 } else if(parts.get(i).equals("2>")) {
@@ -88,7 +95,7 @@ public class Main {
 
             if(outputFile != null){
                 try{
-                    out = new PrintStream(new FileOutputStream(outputFile));
+                    out = new PrintStream(new FileOutputStream(outputFile, appendOutput));
                 } catch(Exception e){
                     e.printStackTrace();
                 }
