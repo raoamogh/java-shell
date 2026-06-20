@@ -285,7 +285,10 @@ public class Main {
                         }
                     });
 
+                    pipeThread.start();
+
                     rightProcess.waitFor();
+                    pipeThread.join();
                     if (leftProcess.isAlive()) {
                         leftProcess.destroy();
                     }
