@@ -274,13 +274,21 @@ public class Main {
 
                     Process rightProcess = rightPB.start();
 
-                    transfer(
-                        leftProcess.getInputStream(),
-                        rightProcess.getOutputStream()
-                    );
+                    Thread pipeThread = new Thread(() -> {
+                        try {
+                            transfer(
+                                leftProcess.getInputStream(),
+                                rightProcess.getOutputStream()
+                            );
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
 
-                    leftProcess.waitFor();
                     rightProcess.waitFor();
+                    if (leftProcess.isAlive()) {
+                        leftProcess.destroy();
+                    }
 
                 } catch(Exception e){
                     e.printStackTrace();
