@@ -27,7 +27,15 @@ public class Main {
         boolean isSingleQuotes = false;
         boolean isDoubleQuotes = false;
 
+        boolean escaped = false;
+
         for(char c : input.toCharArray()){
+            if(escaped){
+                curr.append(c);
+                escaped = false;
+            } else if(c == '\\' && !isSingleQuotes && !isDoubleQuotes){
+                escaped = true;
+            }
             if(c == '\'' && !isDoubleQuotes){
                 isSingleQuotes = !isSingleQuotes;
             } else if(c == '"' && !isSingleQuotes ){
