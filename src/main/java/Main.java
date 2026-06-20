@@ -245,35 +245,41 @@ public class Main {
                     e.printStackTrace();
                 }
             }
-
-            if(pipeIndex != -1){
-                List<String> left = new ArrayList<>(parts.subList(0, pipeIndex));
-                List<String> right = new ArrayList<>(parts.subList(pipeIndex+1, parts.size()));
-            }
             if(pipeIndex != -1){
                 try {
-                    List<String> left =
-                        new ArrayList<>(parts.subList(0, pipeIndex));
+                    List<List<String>> commands = new ArrayList<>();
+                    List<String> current = new ArrayList<>();
 
-                    List<String> right =
-                        new ArrayList<>(parts.subList(pipeIndex + 1, parts.size()));
+                    for(String part : parts) {
+                        if(part.equals("|")) {
+                            commands.add(current);
+                            current = new ArrayList<>();
+                        } else {
+                            current.add(part);
+                        }
+                    }
 
-                    String leftPath = findCmd(left.get(0));
-                    String rightPath = findCmd(right.get(0));
+                    commands.add(current);
 
-                    if (isBuiltin(right.get(0))) {
-                        if (right.get(0).equals("type")) {
-                            String cmd = right.get(1);
 
-                            if (isBuiltin(cmd)) {
-                                System.out.println(cmd + " is a shell builtin");
+                    if(isBuiltin(commands.get(commands.size() - 1).get(0))) {
+
+                        List<String> builtin = commands.get(commands.size() - 1);
+
+                        if(builtin.get(0).equals("type")) {
+
+                            String cmd = builtin.get(1);
+
+                            if(isBuiltin(cmd)) {
+                                out.println(cmd + " is a shell builtin");
                             } else {
+
                                 String loc = findCmd(cmd);
 
-                                if (loc != null) {
-                                    System.out.println(cmd + " is " + loc);
+                                if(loc != null) {
+                                    out.println(cmd + " is " + loc);
                                 } else {
-                                    System.out.println(cmd + ": not found");
+                                    err.println(cmd + ": not found");
                                 }
                             }
                         }
@@ -281,29 +287,48 @@ public class Main {
                         continue;
                     }
 
-                    if(leftPath == null || rightPath == null){
-                        err.println("command not found");
+
+                    List<ProcessBuilder> builders = new ArrayList<>();
+
+                    for(List<String> command : commands) {
+
+                        String path = findCmd(command.get(0));
+
+                        if(path == null) {
+                            err.println(command.get(0) + ": command not found");
+                            builders.clear();
+                            break;
+                        }
+
+                        command.set(0, path);
+
+                        ProcessBuilder pb = new ProcessBuilder(command);
+
+                        builders.add(pb);
+                    }
+
+
+                    if(builders.isEmpty()) {
                         continue;
                     }
 
-                    left.set(0, leftPath);
-                    right.set(0, rightPath);
 
-                    ProcessBuilder leftPB = new ProcessBuilder(left);
-                    ProcessBuilder rightPB = new ProcessBuilder(right);
+                    ProcessBuilder lastBuilder =
+                            builders.get(builders.size() - 1);
 
-                    rightPB.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-                    rightPB.redirectError(ProcessBuilder.Redirect.INHERIT);
+                    lastBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                    lastBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
 
-                    List<ProcessBuilder> pipeline = new ArrayList<>();
-                    pipeline.add(leftPB);
-                    pipeline.add(rightPB);
 
-                    List<Process> processes = ProcessBuilder.startPipeline(pipeline);
+                    List<Process> processes =
+                            ProcessBuilder.startPipeline(builders);
 
-                    Process last = processes.get(processes.size() - 1);
 
-                    last.waitFor();
+                    Process lastProcess =
+                            processes.get(processes.size() - 1);
+
+
+                    lastProcess.waitFor();
 
                 } catch(Exception e){
                     e.printStackTrace();
