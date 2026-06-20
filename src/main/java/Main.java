@@ -140,7 +140,7 @@ public class Main {
             } else if(parts.get(0).equals("type")){
                 String cmd = parts.get(1);
 
-                if(cmd.equals("echo") || cmd.equals("exit") || cmd.equals("type") || cmd.equals("pwd")){
+                if(cmd.equals("echo") || cmd.equals("exit") || cmd.equals("type") || cmd.equals("pwd") || cmd.equals("jobs")){
                     out.println(cmd + " is a shell builtin");
                 } else {
                     String loc = findCmd(cmd);
