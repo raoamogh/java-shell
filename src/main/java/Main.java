@@ -25,11 +25,14 @@ public class Main {
         StringBuilder curr = new StringBuilder();
 
         boolean isSingleQuotes = false;
+        boolean isDoubleQuotes = false;
 
         for(char c : input.toCharArray()){
-            if(c == '\''){
+            if(c == '\'' && !isDoubleQuotes){
                 isSingleQuotes = !isSingleQuotes;
-            } else if(c == ' ' && !isSingleQuotes){
+            } else if(c == '"' && !isSingleQuotes ){
+                isDoubleQuotes = !isDoubleQuotes;
+            }else if(c == ' ' && !isSingleQuotes && !isDoubleQuotes){
                 if(curr.length() > 0){
                     parts.add(curr.toString());
                     curr.setLength(0);
