@@ -64,6 +64,7 @@ public class Main {
             System.out.print("$ ");
             String input = sc.nextLine();
             PrintStream out = System.out;
+            PrintStream err = System.err;
 
             if(input.equals("exit")){
                 break;
@@ -71,10 +72,15 @@ public class Main {
 
             List<String> parts = parseCmd(input);
             String outputFile = null;
+            String errorFile = null;
 
             for(int i = 0; i < parts.size(); i++){
                 if(parts.get(i).equals(">") || parts.get(i).equals("1>")){
                     outputFile = parts.get(i+1);
+                    parts = new ArrayList<>(parts.subList(0, i));
+                    break;
+                } else if(parts.get(i).equals("2>")) {
+                    errorFile = parts.get(i+1);
                     parts = new ArrayList<>(parts.subList(0, i));
                     break;
                 }
@@ -87,6 +93,14 @@ public class Main {
                     e.printStackTrace();
                 }
                 
+            }
+
+            if(errorFile != null){
+                try{
+                    err = new PrintStream(new FileOutputStream(errorFile));
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
             }
 
             if(parts.get(0).equals("echo")){
@@ -110,7 +124,7 @@ public class Main {
                     if(loc != null){
                         out.println(cmd + " is " + loc);
                     } else {
-                        out.println(cmd + ": not found");
+                        err.println(cmd + ": not found");
                     }
                 }
             } else if(parts.get(0).equals("pwd")){
@@ -132,7 +146,7 @@ public class Main {
                         e.printStackTrace();
                     }
                 } else {
-                    out.println("cd: " + parts.get(1) + ": No such file or directory");
+                    err.println("cd: " + parts.get(1) + ": No such file or directory");
                 }
             } else {
                 String exec = findCmd(parts.get(0));
@@ -143,13 +157,16 @@ public class Main {
                         if(outputFile != null){
                             pb.redirectOutput(new File(outputFile));
                         }
+                        if(errorFile != null){
+                            pb.redirectError(new File(errorFile));
+                        }
                         Process process = pb.start();
                         process.waitFor();
                     } catch (Exception e){
                         e.printStackTrace();
                     }
                 } else {
-                    out.println(input + ": command not found");
+                    err.println(input + ": command not found");
                 }
             } 
         }
