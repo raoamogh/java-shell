@@ -119,6 +119,27 @@ public class Main {
     public static void reapJobs(List<Job> jobs) {
         jobs.removeIf(job -> job.done && job.notified);
     }
+
+    public static int getNextJobId(List<Job> jobs) {
+        int id = 1;
+
+        while (true) {
+            boolean used = false;
+
+            for (Job job : jobs) {
+                if (job.id == id) {
+                    used = true;
+                    break;
+                }
+            }
+
+            if (!used) {
+                return id;
+            }
+
+            id++;
+        }
+    }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         String currDir = System.getProperty("user.dir");
@@ -295,7 +316,7 @@ public class Main {
                         if(!bg){
                             process.waitFor();
                         } else {
-                            int jobId = jobs.size()+1;
+                            int jobId = getNextJobId(jobs);
                             jobs.add(new Job(
                                 jobId,
                                 process,
