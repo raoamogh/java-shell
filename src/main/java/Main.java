@@ -266,8 +266,9 @@ public class Main {
 
                     ProcessBuilder rightPB =
                         new ProcessBuilder(right);
-
-                    rightPB.inheritIO();
+                    
+                    rightPB.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                    rightPB.redirectError(ProcessBuilder.Redirect.INHERIT);
 
                     Process leftProcess = leftPB.start();
 
@@ -286,8 +287,7 @@ public class Main {
                 }
 
                 continue;
-            }
-            else if(parts.get(0).equals("echo")){
+            } else if(parts.get(0).equals("echo")){
                 for(int i = 1; i < parts.size(); i++){
                     out.print(parts.get(i));
 
