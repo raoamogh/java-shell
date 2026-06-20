@@ -225,7 +225,24 @@ public class Main {
                                 process,
                                 input
                             ));
-                            out.println("[" + jobId + "] " + process.pid());
+                            for (int i = 0; i < jobs.size(); i++) {
+                                Job job = jobs.get(i);
+                                char marker = ' ';
+
+                                if (i == jobs.size() - 1) {
+                                    marker = '+';
+                                } else if (i == jobs.size() - 2) {
+                                    marker = '-';
+                                }
+
+                                out.printf(
+                                    "[%d]%c  %-23s %s%n",
+                                    job.id,
+                                    marker,
+                                    "Running",
+                                    job.cmd
+                                );
+                            }
                         }
                         
                     } catch (Exception e){
