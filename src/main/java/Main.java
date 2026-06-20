@@ -13,7 +13,8 @@ class Job {
     String runningCmd;
     String doneCmd;
 
-    String status;
+    boolean done;
+    boolean notified;
 
     Job(int id, Process process, String command) {
         this.id = id;
@@ -22,7 +23,8 @@ class Job {
         this.runningCmd = command;
         this.doneCmd = command.replaceAll("\\s*&\\s*$", "");
 
-        this.status = "Running";
+        this.done = false;
+        this.notified = false;
     }
 }
 
@@ -79,34 +81,53 @@ public class Main {
         return parts;
     }
 
-    public static void checkFinishedJobs(List<Job> jobs) {
+    public static void updateJobs(List<Job> jobs) {
         for (Job job : jobs) {
-            if (!job.process.isAlive() && job.status.equals("Running")) {
-                job.status = "Done";
+            if (!job.done && !job.process.isAlive()) {
+                job.done = true;
+            }
+        }
+    }
 
-                String command;
+    public static void notifyDoneJobs(List<Job> jobs) {
+        for (int i = 0; i < jobs.size(); i++) {
+            Job job = jobs.get(i);
 
-                if(job.status.equals("Running")) {
-                    command = job.runningCmd;
-                } else {
-                    command = job.doneCmd;
+            if (job.done && !job.notified) {
+
+                char marker = ' ';
+
+                if (i == jobs.size() - 1) {
+                    marker = '+';
+                } else if (i == jobs.size() - 2) {
+                    marker = '-';
                 }
 
                 System.out.printf(
-                    "[%d]+  %-23s %s%n",
+                    "[%d]%c  %-23s %s%n",
                     job.id,
+                    marker,
                     "Done",
-                    command
+                    job.doneCmd
                 );
+
+                job.notified = true;
             }
         }
+    }
+
+    public static void reapJobs(List<Job> jobs) {
+        jobs.removeIf(job -> job.done && job.notified);
     }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         String currDir = System.getProperty("user.dir");
         List<Job> jobs = new ArrayList<>();
+        int nextJobId = 1;
         while(true){
-            checkFinishedJobs(jobs);
+            reapJobs(jobs);
+            updateJobs(jobs);
+            notifyDoneJobs(jobs);
             System.out.print("$ ");
             String input = sc.nextLine();
             PrintStream out = System.out;
@@ -213,8 +234,10 @@ public class Main {
                 } else {
                     err.println("cd: " + parts.get(1) + ": No such file or directory");
                 }
-            } else if(parts.get(0).equals("jobs")){
-                jobs.removeIf(job -> job.status.equals("Done"));
+            } else if (parts.get(0).equals("jobs")) {
+
+                updateJobs(jobs);
+
                 for (int i = 0; i < jobs.size(); i++) {
                     Job job = jobs.get(i);
 
@@ -226,21 +249,21 @@ public class Main {
                         marker = '-';
                     }
 
-                    String command;
+                    String status = job.done ? "Done" : "Running";
 
-                    if (job.status.equals("Running")) {
-                        command = job.runningCmd;
-                    } else {
-                        command = job.doneCmd;
-                    }
+                    String command = job.done ? job.doneCmd : job.runningCmd;
 
                     out.printf(
                         "[%d]%c  %-23s %s%n",
                         job.id,
                         marker,
-                        job.status,
+                        status,
                         command
                     );
+
+                    if (job.done) {
+                        job.notified = true;
+                    }
                 }
             } else {
                 String exec = findCmd(parts.get(0));
@@ -279,6 +302,8 @@ public class Main {
                                 input
                             ));
                             out.println("[" + jobId + "] " + process.pid());
+
+                            nextJobId++;
                         }
                         
                     } catch (Exception e){
